@@ -6,13 +6,19 @@ public class Player : MonoBehaviour {
 
 	private Controller2D controller;
 
-	private float gravity = -20;
 	private Vector3 velocity;
+
+	private float jumpHeight = 4; // In world units
+	private float timeToJumpApex = 0.4f; // In seconds
 	private float moveSpeed = 6;
-	private float jumpVelocity = 8;
+
+	private float gravity;
+	private float jumpVelocity;
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
+		gravity = (2 * jumpHeight) / (Mathf.Pow (timeToJumpApex, 2));
+		jumpVelocity = gravity * timeToJumpApex;
 	}
 
 	private void Update () {
