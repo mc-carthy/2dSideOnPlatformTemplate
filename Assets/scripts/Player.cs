@@ -8,12 +8,17 @@ public class Player : MonoBehaviour {
 
 	private Vector3 velocity;
 
+	[SerializeField]
 	private float jumpHeight = 4; // In world units
+	[SerializeField]
 	private float timeToJumpApex = 0.4f; // In seconds
 	private float moveSpeed = 6;
 
 	private float gravity;
 	private float jumpVelocity;
+	private float velocityXSmoothing;
+	private float accTimeAir = 0.2f;
+	private float accTimeGround = 0.1f;
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
@@ -33,7 +38,10 @@ public class Player : MonoBehaviour {
 			velocity.y = jumpVelocity;
 		}
 
-		velocity.x = input.x * moveSpeed;
+
+		float targetVelocityX = input.x * moveSpeed;
+
+		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accTimeGround : accTimeAir);
 		velocity.y += gravity * Time.deltaTime;
 
 		controller.Move (velocity * Time.deltaTime);
