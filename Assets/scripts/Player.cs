@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	private Controller2D controller;
+
+	private void Start () {
+
 	}
 }
