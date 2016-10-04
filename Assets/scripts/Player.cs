@@ -8,13 +8,19 @@ public class Player : MonoBehaviour {
 
 	private float gravity = -20;
 	private Vector3 velocity;
+	private float moveSpeed = 6;
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
 	}
 
 	private void Update () {
+
+		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
+
+		velocity.x = input.x * moveSpeed;
 		velocity.y += gravity * Time.deltaTime;
+
 		controller.Move (velocity * Time.deltaTime);
 	}
 }
