@@ -6,6 +6,8 @@ public class Controller2D : MonoBehaviour {
 
 	private const float skinWidth = 0.15f;
 
+	public LayerMask collisionMask;
+
 	public int horizontalRayCount = 4;
 	public int verticalRayCount = 4;
 
@@ -17,14 +19,28 @@ public class Controller2D : MonoBehaviour {
 
 	private void Start () {
 		collider = GetComponent<BoxCollider2D> ();
+		CalculateRaySpacing ();
 	}
 
-	private void Update () {
+	public void Move (Vector3 velocity) {
 		UpdateRaycastOrigins ();
-		CalculateRaySpacing ();
+		VerticalCollisions (ref velocity);
+		transform.Translate (velocity);
+	}
 
+	private void VerticalCollisions (ref Vector3 velocity) {
+		float dirY = Mathf.Sign (velocity.y);
+		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
 		for (int i = 0; i < verticalRayCount; i++) {
+			Vector2 rayOrigin = (dirY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
+			rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
+			RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up * dirY, rayLength, collisionMask);
 			Debug.DrawRay (raycastOrigins.bottomLeft + Vector2.right * verticalRaySpacing * i, Vector2.up * -2, Color.red);
+
+			if (hit) {
+				velocity.y = (hit.distance - skinWidth) * dirY;
+				rayLength = hit.distance;
+			}
 		}
 	}
 
