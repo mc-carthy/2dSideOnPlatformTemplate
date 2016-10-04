@@ -56,7 +56,23 @@ public class Controller2D : MonoBehaviour {
 				}
 
 				collisions.below = dirY == -1;
-				collisions.above = dirY == 1;			}
+				collisions.above = dirY == 1;			
+			}
+		}
+
+		if (collisions.climbingSlope) {
+			float dirX = Mathf.Sign (velocity.x);
+			rayLength = Mathf.Abs (velocity.x) + skinWidth;
+			Vector2 rayOrigin = ((dirX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight) + Vector2.up * velocity.y;
+			RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.right * dirX, rayLength, collisionMask);
+
+			if (hit) {
+				float slopeAngle = Vector2.Angle (hit.normal, Vector2.up);
+				if (slopeAngle != collisions.slopeAngle) {
+					velocity.x = (hit.distance - skinWidth) * dirX;
+					collisions.slopeAngle = slopeAngle;
+				}
+			}
 		}
 	}
 
