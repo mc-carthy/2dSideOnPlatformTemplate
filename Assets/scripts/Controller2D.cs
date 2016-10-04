@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Controller2D : MonoBehaviour {
 
-	private const float skinWidth = 0.15f;
+	private const float skinWidth = 0.05f;
 
 	public LayerMask collisionMask;
 
@@ -18,6 +18,8 @@ public class Controller2D : MonoBehaviour {
 
 	private float horizontalRaySpacing;
 	private float verticalRaySpacing;
+
+	private float maxClimbAngle = 60;
 
 	private void Start () {
 		collider = GetComponent<BoxCollider2D> ();
@@ -64,6 +66,13 @@ public class Controller2D : MonoBehaviour {
 			Debug.DrawRay (rayOrigin, Vector2.right * dirX * rayLength, Color.red);
 
 			if (hit) {
+
+				float slopeAngle = Vector2.Angle (hit.normal, Vector2.up);
+
+				if (i == 0 && slopeAngle <= maxClimbAngle) {
+					ClimbSlope (ref velocity, slopeAngle);
+				}
+
 				velocity.x = (hit.distance - skinWidth) * dirX;
 				rayLength = hit.distance;
 
@@ -71,6 +80,14 @@ public class Controller2D : MonoBehaviour {
 				collisions.right = dirX == 1;
 			}
 		}
+	}
+
+	private void ClimbSlope (ref Vector3 velocity, float slopeAngle) {
+
+		float moveDistance = Mathf.Abs (velocity.x);
+
+		velocity.y = moveDistance * Mathf.Sin (slopeAngle * Mathf.Deg2Rad);
+		velocity.x = moveDistance * Mathf.Cos (slopeAngle * Mathf.Deg2Rad) * Mathf.Sign (velocity.x);
 	}
 
 	private void UpdateRaycastOrigins () {
