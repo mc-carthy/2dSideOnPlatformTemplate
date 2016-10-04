@@ -9,6 +9,7 @@ public class Player : MonoBehaviour {
 	private float gravity = -20;
 	private Vector3 velocity;
 	private float moveSpeed = 6;
+	private float jumpVelocity = 8;
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
@@ -21,6 +22,10 @@ public class Player : MonoBehaviour {
 		}
 
 		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
+
+		if (Input.GetKeyDown (KeyCode.Space) && controller.collisions.below) {
+			velocity.y = jumpVelocity;
+		}
 
 		velocity.x = input.x * moveSpeed;
 		velocity.y += gravity * Time.deltaTime;
