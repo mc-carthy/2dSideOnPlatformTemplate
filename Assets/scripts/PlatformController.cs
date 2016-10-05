@@ -7,6 +7,8 @@ public class PlatformController : RaycastController {
 	public float speed;
 	public bool isCyclic;
 	public float waitTime;
+	[Range(0, 2)]
+	public float easeAmount;
 
 	private int fromWayPointIndex;
 	private float percentBetweenWaypoints;
@@ -42,6 +44,11 @@ public class PlatformController : RaycastController {
 		MovePassengers (false);
 	}
 
+	private float Ease (float x) {
+		float a = easeAmount + 1;
+		return Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
+	}
+
 	private Vector3 CalculatePlatformMovement () {
 		if (Time.time < nextMoveTime) {
 			return Vector3.zero;
@@ -50,8 +57,10 @@ public class PlatformController : RaycastController {
 		int toWaypointIndex = ((fromWayPointIndex + 1) % globalWaypoints.Length);
 		float distBetweenPoints = Vector3.Distance (globalWaypoints [fromWayPointIndex], globalWaypoints [toWaypointIndex]);
 		percentBetweenWaypoints += (speed / distBetweenPoints) * Time.deltaTime;
+		percentBetweenWaypoints = Mathf.Clamp01 (percentBetweenWaypoints);
+		float easedPercentBetweenWaypoints = Ease (percentBetweenWaypoints);
 
-		Vector3 newPos = Vector3.Lerp (globalWaypoints[fromWayPointIndex], globalWaypoints[toWaypointIndex], percentBetweenWaypoints);
+		Vector3 newPos = Vector3.Lerp (globalWaypoints[fromWayPointIndex], globalWaypoints[toWaypointIndex], easedPercentBetweenWaypoints);
 
 		if (percentBetweenWaypoints >= 1) {
 			percentBetweenWaypoints = 0;
@@ -85,7 +94,6 @@ public class PlatformController : RaycastController {
 				Debug.DrawRay (rayOrigin, Vector2.up * dirY * rayLength, Color.red);
 
 				if (hit) {
-					Debug.Log (hit.transform.name);
 					if (!movedPassengers.Contains(hit.transform)) {
 						movedPassengers.Add (hit.transform);
 						float pushX = (dirY == 1) ? velocity.x : 0;
