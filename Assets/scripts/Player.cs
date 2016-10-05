@@ -23,6 +23,8 @@ public class Player : MonoBehaviour {
 	private float accTimeAir = 0.2f;
 	private float accTimeGround = 0.1f;
 	private float wallSlideSpeedMax = 3;
+	private float wallStickTime = 0.25f;
+	private float timeToWallUnstick;
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
@@ -34,16 +36,32 @@ public class Player : MonoBehaviour {
 		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
 		int wallDirX = (controller.collisions.left) ? -1 : 1;
 
+		float targetVelocityX = input.x * moveSpeed;
+		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accTimeGround : accTimeAir);
+
 		bool isWallSliding = false;
 
 		if (
-			(controller.collisions.left || controller.collisions.right) &&
-			(!controller.collisions.below) &&
-			(velocity.y < 0)) {
+		(controller.collisions.left || controller.collisions.right) &&
+		(!controller.collisions.below) &&
+		(velocity.y < 0)) 
+		{
 			isWallSliding = true;
 
 			if (velocity.y < -wallSlideSpeedMax) {
 				velocity.y = -wallSlideSpeedMax;
+			}
+
+			if (timeToWallUnstick > 0) {
+				velocityXSmoothing = 0;
+				velocity.x = 0;
+				if (Mathf.Sign (input.x) != wallDirX && input.x != 0) {
+					timeToWallUnstick -= Time.deltaTime;
+				} else {
+					timeToWallUnstick = wallStickTime;
+				}
+			} else {
+				timeToWallUnstick = wallStickTime;
 			}
 		}
 
@@ -69,10 +87,6 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-
-		float targetVelocityX = input.x * moveSpeed;
-
-		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accTimeGround : accTimeAir);
 		velocity.y += gravity * Time.deltaTime;
 
 		controller.Move (velocity * Time.deltaTime);
