@@ -7,7 +7,7 @@ public class CameraController : MonoBehaviour {
 	private Vector2 focusAreaSize = new Vector3 (3, 5);
 	private float verticalOffset = 1;
 	private float lookAheadDistX = 4;
-	private float lookSmoothTimeX = 0.2f;
+	private float lookSmoothTimeX = 0.5f;
 	private float lookSmoothTimeY = 0.2f;
 
 	private FocusArea focusArea;
@@ -43,6 +43,7 @@ public class CameraController : MonoBehaviour {
 
 		currentLookAheadX = Mathf.SmoothDamp (currentLookAheadX, targetLookAheadX, ref smoothLookVelocityX, lookSmoothTimeX);
 
+		focusPosition.y = Mathf.SmoothDamp (transform.position.y, focusPosition.y, ref smoothLookVelocityY, lookSmoothTimeY);
 		focusPosition += Vector2.right * currentLookAheadX;
 
 		transform.position = (Vector3)focusPosition + Vector3.forward * -10;
