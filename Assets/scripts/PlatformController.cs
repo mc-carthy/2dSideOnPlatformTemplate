@@ -94,8 +94,8 @@ public class PlatformController : RaycastController {
 		if (velocity.x != 0) {
 			float rayLength = Mathf.Abs (velocity.x) + skinWidth;
 			for (int i = 0; i < horizontalRayCount; i++) {
-				Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
-				rayOrigin += Vector2.right * (verticalRaySpacing * i);
+				Vector2 rayOrigin = (dirX == 1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
+				rayOrigin += Vector2.right * (verticalRaySpacing * i * dirX);
 				RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.right * dirX, rayLength, passengerMask);
 				Debug.DrawRay (rayOrigin, Vector2.right * dirX * rayLength, Color.red);
 
