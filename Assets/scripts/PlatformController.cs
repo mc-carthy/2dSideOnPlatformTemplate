@@ -112,7 +112,7 @@ public class PlatformController : RaycastController {
 	private void MovePassengers (bool beforeMovePlatform) {
 		foreach (PassengerMovement passenger in passengerMovement) {
 			if (passenger.moveBeforePlatform == beforeMovePlatform) {
-				passenger.transform.GetComponent<Controller2D> ().Move (passenger.velocity);
+				passenger.transform.GetComponent<Controller2D> ().Move (passenger.velocity, passenger.isStandingOnPlatform);
 			}
 		}
 	}
