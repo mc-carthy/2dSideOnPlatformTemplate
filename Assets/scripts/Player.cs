@@ -7,6 +7,9 @@ public class Player : MonoBehaviour {
 	private Controller2D controller;
 
 	private Vector3 velocity;
+	private Vector2 wallJumpClimb = new Vector2(7.5f, 16);
+	private Vector2 wallJumpOff = new Vector2(8.5f, 7);
+	private Vector2 wallJumpLeap = new Vector2(18, 17);
 
 	[SerializeField]
 	private float jumpHeight = 4; // In world units
@@ -28,6 +31,8 @@ public class Player : MonoBehaviour {
 	}
 
 	private void Update () {
+		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
+		int wallDirX = (controller.collisions.left) ? -1 : 1;
 
 		bool isWallSliding = false;
 
@@ -45,11 +50,23 @@ public class Player : MonoBehaviour {
 		if (controller.collisions.above || controller.collisions.below) {
 			velocity.y = 0;
 		}
-
-		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
-
-		if (Input.GetKeyDown (KeyCode.Space) && controller.collisions.below) {
-			velocity.y = jumpVelocity;
+			
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			if (isWallSliding) {
+				if (wallDirX == Mathf.Sign(input.x)) {
+					velocity.x = -wallDirX * wallJumpClimb.x;
+					velocity.y = wallJumpClimb.y;
+				} else if (input.x == 0) {
+					velocity.x = -wallDirX * wallJumpOff.x;
+					velocity.y = wallJumpOff.y;
+				} else if (wallDirX == -Mathf.Sign(input.x)) {
+					velocity.x = -wallDirX * wallJumpLeap.x;
+					velocity.y = wallJumpLeap.y;
+				}
+			}
+			if (controller.collisions.below) {
+				velocity.y = jumpVelocity;
+			}
 		}
 
 
