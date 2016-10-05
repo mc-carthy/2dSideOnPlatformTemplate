@@ -8,9 +8,9 @@ public class RaycastController : MonoBehaviour {
 
 	[SerializeField]
 	protected LayerMask collisionMask;
-
-	protected int horizontalRayCount = 4;
-	protected int verticalRayCount = 4;
+	const float distBetweenRays = 0.25f;
+	protected int horizontalRayCount;
+	protected int verticalRayCount;
 
 	protected RaycastOrigins raycastOrigins;
 	public BoxCollider2D collider;
@@ -40,6 +40,12 @@ public class RaycastController : MonoBehaviour {
 		Bounds bounds = collider.bounds;
 		// Reduce the bounds so that they are inside the object by a distance of skin width
 		bounds.Expand (skinWidth * -2);
+
+		float boundsWidth = bounds.size.x;
+		float boundsHeight = bounds.size.y;
+
+		horizontalRayCount = Mathf.RoundToInt(boundsHeight / distBetweenRays);
+		verticalRayCount = Mathf.RoundToInt(boundsWidth / distBetweenRays);
 
 		// Ensure there are at least 2 rays created both vertically and horizontally
 		horizontalRayCount = Mathf.Clamp (horizontalRayCount, 2, int.MaxValue);
