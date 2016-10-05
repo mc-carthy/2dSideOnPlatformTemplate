@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PlatformController : RaycastController {
 
 	private List<PassengerMovement> passengerMovement;
+	private Dictionary<Transform, Controller2D> passengerDictionary = new Dictionary<Transform, Controller2D>();
 
 	[SerializeField]
 	private LayerMask passengerMask;
@@ -111,8 +112,11 @@ public class PlatformController : RaycastController {
 
 	private void MovePassengers (bool beforeMovePlatform) {
 		foreach (PassengerMovement passenger in passengerMovement) {
+			if (!passengerDictionary.ContainsKey (passenger.transform)) {
+				passengerDictionary.Add (passenger.transform, passenger.transform.GetComponent<Controller2D> ());
+			}
 			if (passenger.moveBeforePlatform == beforeMovePlatform) {
-				passenger.transform.GetComponent<Controller2D> ().Move (passenger.velocity, passenger.isStandingOnPlatform);
+				passengerDictionary[passenger.transform].Move (passenger.velocity, passenger.isStandingOnPlatform);
 			}
 		}
 	}
