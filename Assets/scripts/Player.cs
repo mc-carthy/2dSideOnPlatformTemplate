@@ -12,13 +12,16 @@ public class Player : MonoBehaviour {
 	private Vector2 wallJumpLeap = new Vector2(18, 17);
 
 	[SerializeField]
-	private float jumpHeight = 4; // In world units
+	private float maxJumpHeight = 4; // In world units
+	[SerializeField]
+	private float minJumpHeight = 1; // In world units
 	[SerializeField]
 	private float timeToJumpApex = 0.4f; // In seconds
 	private float moveSpeed = 6;
 
 	private float gravity;
-	private float jumpVelocity;
+	private float maxJumpVelocity;
+	private float minJumpVelocity;
 	private float velocityXSmoothing;
 	private float accTimeAir = 0.2f;
 	private float accTimeGround = 0.1f;
@@ -28,8 +31,9 @@ public class Player : MonoBehaviour {
 
 	private void Start () {
 		controller = GetComponent<Controller2D> ();
-		gravity = -(2 * jumpHeight) / (Mathf.Pow (timeToJumpApex, 2));
-		jumpVelocity = Mathf.Abs(gravity * timeToJumpApex);
+		gravity = -(2 * maxJumpHeight) / (Mathf.Pow (timeToJumpApex, 2));
+		maxJumpVelocity = Mathf.Abs(gravity * timeToJumpApex);
+		minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity)) * minJumpHeight;
 	}
 
 	private void Update () {
@@ -83,7 +87,12 @@ public class Player : MonoBehaviour {
 				}
 			}
 			if (controller.collisions.below) {
-				velocity.y = jumpVelocity;
+				velocity.y = maxJumpVelocity;
+			}
+		}
+		if (Input.GetKeyUp (KeyCode.Space)) {
+			if (velocity.y > minJumpVelocity) {
+				velocity.y = minJumpVelocity;
 			}
 		}
 
