@@ -5,7 +5,7 @@ public class Controller2D : RaycastController {
 
 	public CollisionInfo collisions;
 
-	private float maxSlopeAngle = 60;
+	private float maxSlopeAngle = 10;
 
 	[HideInInspector]
 	public Vector2 playerInput;
@@ -173,8 +173,10 @@ public class Controller2D : RaycastController {
 		RaycastHit2D maxSlopeHitLeft = Physics2D.Raycast (raycastOrigins.bottomLeft, Vector2.down, Mathf.Abs (moveDist.y) + skinWidth, collisionMask);
 		RaycastHit2D maxSlopeHitRight = Physics2D.Raycast (raycastOrigins.bottomRight, Vector2.down, Mathf.Abs (moveDist.y) + skinWidth, collisionMask);
 
-		SlideDownMaxSlope (maxSlopeHitLeft, ref moveDist);
-		SlideDownMaxSlope (maxSlopeHitRight, ref moveDist);
+		if (maxSlopeHitLeft ^ maxSlopeHitRight) {
+			SlideDownMaxSlope (maxSlopeHitLeft, ref moveDist);
+			SlideDownMaxSlope (maxSlopeHitRight, ref moveDist);
+		}
 
 		if (!collisions.slidingDownMaxSlope) {
 
