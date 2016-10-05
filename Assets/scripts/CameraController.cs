@@ -17,6 +17,7 @@ public class CameraController : MonoBehaviour {
 	private float lookAheadDirX;
 	private float smoothLookVelocityX;
 	private float smoothLookVelocityY;
+	private bool lookAheadStopped;
 
 	private void Start () {
 		target = FindObjectOfType<Player> ().gameObject.GetComponent<Controller2D>();
@@ -29,9 +30,17 @@ public class CameraController : MonoBehaviour {
 
 		if (focusArea.velocity.x != 0) {
 			lookAheadDirX = Mathf.Sign (focusArea.velocity.x);
+			if (Mathf.Sign (target.playerInput.x) == Mathf.Sign (focusArea.velocity.x) && target.playerInput.x != 0) {
+				lookAheadStopped = false;
+				targetLookAheadX = lookAheadDirX * lookAheadDistX;
+			} else {
+				if (!lookAheadStopped) {
+					targetLookAheadX = currentLookAheadX + (lookAheadDirX * lookAheadDistX - currentLookAheadX) / 4;
+					lookAheadStopped = true;
+				}
+			}
 		}
 
-		targetLookAheadX = lookAheadDirX * lookAheadDistX;
 		currentLookAheadX = Mathf.SmoothDamp (currentLookAheadX, targetLookAheadX, ref smoothLookVelocityX, lookSmoothTimeX);
 
 		focusPosition += Vector2.right * currentLookAheadX;
