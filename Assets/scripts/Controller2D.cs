@@ -8,16 +8,24 @@ public class Controller2D : RaycastController {
 	private float maxClimbAngle = 60;
 	private float maxDescendAngle = 50;
 
+	private Vector2 playerInput;
+
 	protected override void Start () {
 		base.Start ();
 		collisions.faceDir = 1;
 	}
 
 	public void Move (Vector3 velocity, bool isStandingOnPlatform = false) {
+		Move (velocity, Vector2.zero, isStandingOnPlatform);
+	}
+
+	public void Move (Vector3 velocity, Vector2 input, bool isStandingOnPlatform = false) {
 		UpdateRaycastOrigins ();
 		collisions.Reset ();
 
 		collisions.velocityOld = velocity;
+
+		playerInput = input;
 
 		if (velocity.x != 0) {
 			collisions.faceDir = (int)Mathf.Sign (velocity.x);
@@ -51,6 +59,9 @@ public class Controller2D : RaycastController {
 			if (hit) {
 				if (hit.collider.tag == "through") {
 					if (dirY == 1 || hit.distance == 0) {
+						continue;
+					}
+					if (Mathf.Sign (playerInput.y) == -1) {
 						continue;
 					}
 				}
