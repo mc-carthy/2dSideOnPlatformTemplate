@@ -47,7 +47,9 @@ public class Player : MonoBehaviour {
 		controller.Move (velocity * Time.deltaTime, directionalInput);
 
 		if (controller.collisions.above || controller.collisions.below) {
-			velocity.y = 0;
+			if (!controller.collisions.slidingDownMaxSlope) {
+				velocity.y = 0;
+			}
 		}
 	}
 
