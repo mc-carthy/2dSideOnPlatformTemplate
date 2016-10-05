@@ -13,13 +13,16 @@ public class RaycastController : MonoBehaviour {
 	protected int verticalRayCount = 4;
 
 	protected RaycastOrigins raycastOrigins;
-	protected BoxCollider2D collider;
+	public BoxCollider2D collider;
 
 	protected float horizontalRaySpacing;
 	protected float verticalRaySpacing;
 
-	protected virtual void Start () {
+	private void Awake () {
 		collider = GetComponent<BoxCollider2D> ();
+	}
+
+	protected virtual void Start () {
 		CalculateRaySpacing ();
 	}
 
