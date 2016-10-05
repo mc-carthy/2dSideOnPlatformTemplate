@@ -93,7 +93,7 @@ public class PlatformController : RaycastController {
 				RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up * dirY, rayLength, passengerMask);
 				Debug.DrawRay (rayOrigin, Vector2.up * dirY * rayLength, Color.red);
 
-				if (hit) {
+				if (hit && hit.distance != 0) {
 					if (!movedPassengers.Contains(hit.transform)) {
 						movedPassengers.Add (hit.transform);
 						float pushX = (dirY == 1) ? velocity.x : 0;
@@ -118,7 +118,7 @@ public class PlatformController : RaycastController {
 				RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.right * dirX, rayLength, passengerMask);
 				Debug.DrawRay (rayOrigin, Vector2.right * dirX * rayLength, Color.red);
 
-				if (hit) {
+				if (hit && hit.distance != 0) {
 					Debug.Log (hit.transform.name);
 					if (!movedPassengers.Contains(hit.transform)) {
 						movedPassengers.Add (hit.transform);
@@ -143,7 +143,7 @@ public class PlatformController : RaycastController {
 				RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up, rayLength, passengerMask);
 				Debug.DrawRay (rayOrigin, Vector2.up * rayLength, Color.red);
 
-				if (hit) {
+				if (hit && hit.distance != 0) {
 					if (!movedPassengers.Contains(hit.transform)) {
 						movedPassengers.Add (hit.transform);
 						float pushX = velocity.x;
