@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class PlatformController : RaycastController {
 
+	private List<PassengerMovement> passengerMovement;
+
 	[SerializeField]
 	private LayerMask passengerMask;
 	public Vector3 move;
@@ -15,12 +17,16 @@ public class PlatformController : RaycastController {
 	private void Update () {
 		UpdateRaycastOrigins ();
 		Vector3 velocity = move * Time.deltaTime;
-		MovePassengers (velocity);
+		CalculatePassengerMovement (velocity);
+
+		MovePassengers (true);
 		transform.Translate (velocity);
+		MovePassengers (false);
 	}
 
-	private void MovePassengers (Vector3 velocity) {
+	private void CalculatePassengerMovement (Vector3 velocity) {
 		HashSet<Transform> movedPassengers = new HashSet<Transform> ();
+		passengerMovement = new List<PassengerMovement> ();
 
 		float dirX = Mathf.Sign (velocity.x);
 		float dirY = Mathf.Sign (velocity.y);
@@ -40,7 +46,12 @@ public class PlatformController : RaycastController {
 						movedPassengers.Add (hit.transform);
 						float pushX = (dirY == 1) ? velocity.x : 0;
 						float pushY = velocity.y - (hit.distance - skinWidth) * dirY;
-						hit.transform.Translate (new Vector3 (pushX, pushY));
+						passengerMovement.Add(new PassengerMovement(
+							hit.transform, 
+							new Vector3(pushX, pushY),
+							dirY == 1,
+							true
+						));
 					}
 				}
 			}
@@ -61,7 +72,12 @@ public class PlatformController : RaycastController {
 						movedPassengers.Add (hit.transform);
 						float pushX = velocity.x - (hit.distance - skinWidth) * dirX;
 						float pushY = 0;
-						hit.transform.Translate (new Vector3 (pushX, pushY));
+						passengerMovement.Add(new PassengerMovement(
+							hit.transform, 
+							new Vector3(pushX, pushY),
+							false,
+							true
+						));
 					}
 				}
 			}
@@ -81,10 +97,37 @@ public class PlatformController : RaycastController {
 						movedPassengers.Add (hit.transform);
 						float pushX = velocity.x;
 						float pushY = velocity.y;
-						hit.transform.Translate (new Vector3 (pushX, pushY));
+						passengerMovement.Add(new PassengerMovement(
+							hit.transform, 
+							new Vector3(pushX, pushY),
+							true,
+							false
+						));
 					}
 				}
 			}
+		}
+	}
+
+	private void MovePassengers (bool beforeMovePlatform) {
+		foreach (PassengerMovement passenger in passengerMovement) {
+			if (passenger.moveBeforePlatform == beforeMovePlatform) {
+				passenger.transform.GetComponent<Controller2D> ().Move (passenger.velocity);
+			}
+		}
+	}
+
+	private struct PassengerMovement {
+		public Transform transform;
+		public Vector3 velocity;
+		public bool isStandingOnPlatform;
+		public bool moveBeforePlatform;
+
+		public PassengerMovement(Transform _transform, Vector3 _velocity, bool _isStandingOnPlatform, bool _moveBeforePlatform) {
+			transform = _transform;
+			velocity = _velocity;
+			isStandingOnPlatform = _isStandingOnPlatform;
+			moveBeforePlatform = _moveBeforePlatform;
 		}
 	}
 }
