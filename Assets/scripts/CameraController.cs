@@ -3,12 +3,20 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour {
 
-	public float verticalOffset = 1;
-
 	private Controller2D target;
 	private Vector2 focusAreaSize = new Vector3 (3, 5);
+	private float verticalOffset = 1;
+	private float lookAheadDistX = 4;
+	private float lookSmoothTimeX = 0.2f;
+	private float lookSmoothTimeY = 0.2f;
 
-	FocusArea focusArea;
+	private FocusArea focusArea;
+
+	private float currentLookAheadX;
+	private float targetLookAheadX;
+	private float lookAheadDirX;
+	private float smoothLookVelocityX;
+	private float smoothLookVelocityY;
 
 	private void Start () {
 		target = FindObjectOfType<Player> ().gameObject.GetComponent<Controller2D>();
@@ -18,6 +26,15 @@ public class CameraController : MonoBehaviour {
 	private void LateUpdate () {
 		focusArea.Update (target.collider.bounds);
 		Vector2 focusPosition = focusArea.centre + Vector2.up * verticalOffset;
+
+		if (focusArea.velocity.x != 0) {
+			lookAheadDirX = Mathf.Sign (focusArea.velocity.x);
+		}
+
+		targetLookAheadX = lookAheadDirX * lookAheadDistX;
+		currentLookAheadX = Mathf.SmoothDamp (currentLookAheadX, targetLookAheadX, ref smoothLookVelocityX, lookSmoothTimeX);
+
+		focusPosition += Vector2.right * currentLookAheadX;
 
 		transform.position = (Vector3)focusPosition + Vector3.forward * -10;
 	}
@@ -29,9 +46,9 @@ public class CameraController : MonoBehaviour {
 
 	private struct FocusArea {
 		public Vector2 centre;
-		private Vector2 velocity;
-		private float left, right;
-		private float bottom, top;
+		public Vector2 velocity;
+		public float left, right;
+		public float bottom, top;
 
 		public FocusArea(Bounds targetsBounds, Vector2 size) {
 			left = targetsBounds.center.x - size.x / 2;
