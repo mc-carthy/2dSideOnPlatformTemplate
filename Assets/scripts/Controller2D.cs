@@ -84,6 +84,11 @@ public class Controller2D : RaycastController {
 
 			if (hit) {
 
+				// If we're "inside the platform" (as if it has passed from above us), let the horiztonal movement continue as normal so as not to slow it down
+				if (hit.distance == 0) {
+					continue;
+				}
+
 				float slopeAngle = Vector2.Angle (hit.normal, Vector2.up);
 
 				if (i == 0 && slopeAngle <= maxClimbAngle) {
