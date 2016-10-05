@@ -41,38 +41,8 @@ public class Player : MonoBehaviour {
 	}
 
 	private void Update () {
-		wallDirX = (controller.collisions.left) ? -1 : 1;
-
-		float targetVelocityX = directionalInput.x * moveSpeed;
-		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accTimeGround : accTimeAir);
-
-		isWallSliding = false;
-
-		if (
-		(controller.collisions.left || controller.collisions.right) &&
-		(!controller.collisions.below) &&
-		(velocity.y < 0)) 
-		{
-			isWallSliding = true;
-
-			if (velocity.y < -wallSlideSpeedMax) {
-				velocity.y = -wallSlideSpeedMax;
-			}
-
-			if (timeToWallUnstick > 0) {
-				velocityXSmoothing = 0;
-				velocity.x = 0;
-				if (Mathf.Sign (directionalInput.x) != wallDirX && directionalInput.x != 0) {
-					timeToWallUnstick -= Time.deltaTime;
-				} else {
-					timeToWallUnstick = wallStickTime;
-				}
-			} else {
-				timeToWallUnstick = wallStickTime;
-			}
-		}
-
-		velocity.y += gravity * Time.deltaTime;
+		CalculateVelocity ();
+		HandleWallSliding ();
 
 		controller.Move (velocity * Time.deltaTime, directionalInput);
 
@@ -107,5 +77,42 @@ public class Player : MonoBehaviour {
 		if (velocity.y > minJumpVelocity) {
 			velocity.y = minJumpVelocity;
 		}
+	}
+
+	private void HandleWallSliding () {
+
+		wallDirX = (controller.collisions.left) ? -1 : 1;
+
+		isWallSliding = false;
+
+		if (
+			(controller.collisions.left || controller.collisions.right) &&
+			(!controller.collisions.below) &&
+			(velocity.y < 0)) 
+		{
+			isWallSliding = true;
+
+			if (velocity.y < -wallSlideSpeedMax) {
+				velocity.y = -wallSlideSpeedMax;
+			}
+
+			if (timeToWallUnstick > 0) {
+				velocityXSmoothing = 0;
+				velocity.x = 0;
+				if (Mathf.Sign (directionalInput.x) != wallDirX && directionalInput.x != 0) {
+					timeToWallUnstick -= Time.deltaTime;
+				} else {
+					timeToWallUnstick = wallStickTime;
+				}
+			} else {
+				timeToWallUnstick = wallStickTime;
+			}
+		}
+	}
+
+	private void CalculateVelocity () {
+		float targetVelocityX = directionalInput.x * moveSpeed;
+		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accTimeGround : accTimeAir);
+		velocity.y += gravity * Time.deltaTime;
 	}
 }
