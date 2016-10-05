@@ -61,7 +61,12 @@ public class Controller2D : RaycastController {
 					if (dirY == 1 || hit.distance == 0) {
 						continue;
 					}
+					if (collisions.fallingThroughPlatform) {
+						continue;
+					}
 					if (Mathf.Sign (playerInput.y) == -1) {
+						collisions.fallingThroughPlatform = true;
+						Invoke ("ResetFallingThroughPlatform", 0.5f);
 						continue;
 					}
 				}
@@ -187,7 +192,10 @@ public class Controller2D : RaycastController {
 				}
 			}
 		}
+	}
 
+	private void ResetFallingThroughPlatform () {
+		collisions.fallingThroughPlatform = false;
 	}
 
 	public struct CollisionInfo {
@@ -200,6 +208,8 @@ public class Controller2D : RaycastController {
 		public float slopeAngle, slopeAngleOld;
 
 		public int faceDir;
+
+		public bool fallingThroughPlatform;
 
 		public Vector3 velocityOld;
 
